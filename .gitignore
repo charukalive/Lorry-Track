@@ -1,2 +1,3 @@
-# Keep the password config out of version control
+# Local password config file — not needed anymore (password is hashed in HTML)
+# but kept here in case of local dev overrides
 config.js
