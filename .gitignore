@@ -1,0 +1,2 @@
+# Keep the password config out of version control
+config.js
