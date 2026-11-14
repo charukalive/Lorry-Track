@@ -778,8 +778,13 @@
                         openModal('batch-modal');
                     });
                     document.getElementById('edit-old-btn').addEventListener('click', () => {
-                         flatpickr("#edit-date", { dateFormat: "Y-m-d", defaultDate: today });
-                         openModal('edit-old-modal');
+                        flatpickr("#edit-date", { dateFormat: "Y-m-d", defaultDate: today, maxDate: today });
+                        // Reset modal to clean state every time it opens
+                        document.getElementById('edit-old-table-container').innerHTML = '';
+                        document.getElementById('save-old-data-btn').style.display = 'none';
+                        editOldStockData = null;
+                        editOldDate = null;
+                        openModal('edit-old-modal');
                     });
                     document.getElementById('transfer-stock-btn').addEventListener('click', () => {
                         flatpickr("#transfer-date", { dateFormat: "Y-m-d", defaultDate: today, maxDate: today });
@@ -1305,8 +1310,8 @@
                         showLoader('Loading data for ' + date + '...');
                         try {
                             const doc = await stockCollectionRef.doc(date).get();
-                            if (!doc.exists || !doc.data().stock) {
-                                alert('No stock data found for ' + date + '.');
+                            if (!doc.exists || !doc.data().stock || doc.data().stock.length === 0) {
+                                alert('No stock data found for ' + date + '.\n\nOnly dates that have been recorded in the ledger can be edited.');
                                 hideLoader();
                                 return;
                             }
@@ -1401,8 +1406,16 @@
                     
                     
                     // Helpers for modals
-                    ['cancel-batch-btn', 'close-manage-items-btn', 'cancel-report-btn', 'cancel-edit-old-btn', 'cancel-transfer-btn', 'cancel-calculator-btn', 'close-activity-log-btn'].forEach(id => {
+                    ['cancel-batch-btn', 'close-manage-items-btn', 'cancel-report-btn', 'cancel-transfer-btn', 'cancel-calculator-btn', 'close-activity-log-btn'].forEach(id => {
                         document.getElementById(id).addEventListener('click', (e) => closeModal(e.target.closest('.modal').id));
+                    });
+                    // Cancel on Edit Old modal — also wipe stale state
+                    document.getElementById('cancel-edit-old-btn').addEventListener('click', () => {
+                        document.getElementById('edit-old-table-container').innerHTML = '';
+                        document.getElementById('save-old-data-btn').style.display = 'none';
+                        editOldStockData = null;
+                        editOldDate = null;
+                        closeModal('edit-old-modal');
                     });
                 }
             }
